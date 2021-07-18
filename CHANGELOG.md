@@ -1,5 +1,6 @@
 # v2.7.9
 1. feat: 支持 `pattern %plugin=xxx`
+2. feat: 第三方通过 `const proxy = startWhistle(options);` 启动 Whistle 时，可以通过 `proxy.on('onPluginLoad', child, name, moduleName);`、`proxy.on('onPluginLoadError', err, name, moduleName);` 监听插件启动信息
 
 # v2.7.8
 1. feat: 源码目录添加 Dockerfile: https://github.com/avwo/whistle/pull/601
