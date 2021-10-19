@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 /*eslint no-console: "off"*/
+// whistle基于 commander 封装的一个包
 var program = require('starting');
 var path = require('path');
 var config = require('../lib/config');
@@ -15,6 +16,7 @@ var info = util.info;
 
 function showStartupInfo(err, options, debugMode, restart) {
   if (!err || err === true) {
+    // 无错误时
     return showUsage(err, options, restart);
   }
   if (/listen EADDRINUSE/.test(err)) {
@@ -35,7 +37,7 @@ function getName() {
     return RegExp.$1;
   }
 }
-
+// 设置config
 program.setConfig({
   main: function(options) {
     var cmd = process.argv[2];
@@ -46,11 +48,13 @@ program.setConfig({
       return process.exit(1);
     }
     var hash = options && options.storage && encodeURIComponent(options.storage);
+    // return的路径是： /xx/xxx/whistle/index.js
     return path.join(__dirname, '../index.js') + (hash ? '#' + hash + '#' : '');
   },
   name: getName() || config.name,
   version: config.version,
   runCallback: function(err, options) {
+    console.log('options: ', options);
     if (err) {
       showStartupInfo(err, options, true);
       return;
@@ -76,7 +80,7 @@ program.setConfig({
     }
   }
 });
-
+// 配置命令
 program
   .command('status')
   .description('Show the running status');
@@ -89,7 +93,7 @@ program.command('uninstall')
   .description('Uninstall a whistle plugin');
 program.command('exec')
   .description('Exec whistle plugin command');
-  
+// 定义选项  
 program
   .option('-D, --baseDir [baseDir]', 'set the configured storage root path', String, undefined)
   .option('-z, --certDir [directory]', 'set custom certificate store directory', String, undefined)
@@ -132,14 +136,17 @@ var removeItem = function(list, name) {
   i !== -1 && list.splice(i, 1);
 };
 if (cmd === 'status') {
+  // 查看本机运行的 whistle 实例
   var all = argv[3] === '--all';
   if (argv[3] === '-S') {
     storage = argv[4];
   }
   showStatus(all, storage);
 } else if (/^([a-z]{1,2})?uni(nstall)?$/.test(cmd)) {
+  // 卸载插件
   plugin.uninstall(Array.prototype.slice.call(argv, 3));
 } else if (/^([a-z]{1,2})?i(nstall)?$/.test(cmd)) {
+  // 安装 whistle 插件
   cmd = (RegExp.$1 || '') + 'npm';
   argv = Array.prototype.slice.call(argv, 3);
   removeItem(argv, '-g');
@@ -167,5 +174,7 @@ if (cmd === 'status') {
   argv = Array.prototype.slice.call(argv, 4);
   plugin.run(cmd, argv);
 } else {
+  console.log('eleselse: ', argv);
+  // 执行staring中对应的command
   program.parse(argv);
 }

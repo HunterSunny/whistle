@@ -2,7 +2,9 @@ require('./lib/util/patch');
 var net = require('net');
 var tls = require('tls');
 
+// node的版本号。比如process.version是 v12.13.0，ver就是[ '12', '13', '0' ]
 var ver = process.version.substring(1).split('.');
+// 生产模式
 var PROD_RE = /(^|\|)prod(uction)?($|\|)/;
 
 if (ver[0] >= 7 && ver[1] >= 7) {
@@ -21,7 +23,7 @@ if (ver[0] >= 7 && ver[1] >= 7) {
 //see: https://github.com/joyent/node/issues/9272
 var env = process.env || '';
 env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-env.WHISTLE_ROOT = __dirname;
+env.WHISTLE_ROOT = __dirname; // 当前目录
 if (typeof tls.checkServerIdentity == 'function') {
   var checkServerIdentity = tls.checkServerIdentity;
   tls.checkServerIdentity = function() {
@@ -70,6 +72,12 @@ if (!net._normalizeConnectArgs) {
 }
 
 module.exports = function(options, callback) {
+  // options 是 {
+  //   clearPreOptions: false, // 默认
+  //   noGlobalPlugins: false, // 默认
+  //   port: '8881', // yarn run -p 8881
+  //   debugMode: true // 默认
+  // }
   if (typeof options === 'function') {
     callback = options;
     options = null;
@@ -81,6 +89,7 @@ module.exports = function(options, callback) {
       env.PFORK_MODE = 'bind';
     }
   }
+  // 扩展配置信息
   require('./lib/config').extend(options);
   return require('./lib')(callback);
 };

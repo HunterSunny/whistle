@@ -4,6 +4,7 @@ var os = require('os');
 var fs = require('fs');
 var fse = require('fs-extra2');
 var config = require('../lib/config');
+// 文字的颜色
 var colors = require('colors/safe');
 var path = require('path');
 /*eslint no-console: "off"*/
@@ -23,7 +24,9 @@ exports.isRunning = isRunning;
 
 function getIpList() {
   var ipList = [];
+  // 网络接口信息 https://nodejs.org/api/os.html#os_os_networkinterfaces
   var ifaces = os.networkInterfaces();
+  console.log('ifaces: ', ifaces);
   Object.keys(ifaces).forEach(function(ifname) {
     ifaces[ifname].forEach(function (iface) {
       if (iface.family == 'IPv4') {
@@ -70,9 +73,11 @@ function showUsage(isRunning, options, restart) {
       warn('[!] ' + config.name + '@' + config.version + ' is running');
     }
   } else {
+    // [i] whistle@2.7.11 started
     info('[i] ' + config.name + '@' + config.version + (restart ? ' restarted' : ' started'));
   }
   var port = /^\d+$/.test(options.port) && options.port > 0 ?  options.port : config.port;
+  // 没有指定的话，就用系统默认获取的
   var list = options.host ? [options.host] : getIpList();
   info('[i] 1. use your device to visit the following URL list, gets the ' + colors.bold('IP') + ' of the URL you can access:');
   info(list.map(function(ip) {
